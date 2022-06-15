@@ -6,10 +6,10 @@ import time
 
 def find_location(right_point, left_point, frame_right, frame_left, baseline,f, alpha):
 
-    # CONVERT FOCAL LENGTH f FROM [mm] TO [pixel]:
     height_right, width_right, depth_right = frame_right.shape
     height_left, width_left, depth_left = frame_left.shape
 
+    # CONVERT FOCAL LENGTH f FROM [mm] TO [pixel]
     if width_right == width_left:
         f_pixel = (width_right * 0.5) / np.tan(alpha * 0.5 * np.pi/180)
 
@@ -24,11 +24,8 @@ def find_location(right_point, left_point, frame_right, frame_left, baseline,f, 
 
     # CALCULATE THE DISPARITY:
     disparity = x_left-x_right      #Displacement between left and right frames [pixels]
-
-    print(disparity)
-    print(f_pixel)
     
-    # CALCULATE DEPTH z:
+    # CALCULATE LOCATION:
     Z = (baseline*f_pixel)/disparity   #Z in [cm]
     X = (Z*x_left)/f_pixel             #X in [cm]
     Y = (Z*y_left)/f_pixel             #Y in [cm]
