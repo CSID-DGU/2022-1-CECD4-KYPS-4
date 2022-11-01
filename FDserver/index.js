@@ -2,6 +2,7 @@ const express = require('express');
 var fs = require('fs')
 const path = require('path');
 const converter = require('json-2-csv');
+const json2csv = require('json2csv');
 var stringify = require('csv-stringify');
 const app = express();
 
@@ -21,13 +22,20 @@ app.post('/sensor', (req, res) => {
   FILE_NAME = "test.csv";
   csvPath = path.join(__dirname, '/csvs', FILE_NAME);
   
-  converter.json2csv(sensorData, {header:false}, (err, csvData) => {
+  fields = ['sensor1', 'sensor2', 'date']
+  var toCsv = {
+    data : req.body,
+    fields : fields,
+    header: false,
+  };
+  
+  converter.json2csv(sensorData, (err, csvData) => {
     if (err){
       throw err
     }
     console.log(csvData)
-    fs.appendFileSync(csvPath, csvData + '\r\n')
-  })
+    fs.appendFileSync(csvPath, csvData + '\n')
+  }, {prependHeader:false})  
 
   console.log(sensorData);
   res.send(sensorData);
