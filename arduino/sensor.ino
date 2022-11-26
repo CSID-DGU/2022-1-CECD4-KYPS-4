@@ -2,8 +2,7 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 
-int echoPin[] = {4,2,27,32};
-int triggerPin[] = {0,15,14,33};
+int inputPin[] = {4,2,27,32};
 
 // WiFi 연결 
 const char* ssid = "HCN-413";
@@ -26,8 +25,7 @@ void setup() {
   // Pin initialize
   Serial.begin(115200);
   for (int i = 0; i < 4; i++) {
-    pinMode(triggerPin[i], OUTPUT);
-    pinMode(echoPin[i], INPUT);
+    pinMode(inputPin[i], INPUT);
   }
   
   Serial.print("Connecting to ");
@@ -50,8 +48,7 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   // long duration0, distance0, duration1, distance1, duration2, distance2, duration3, distance3;
-  long duration[4];
-  long distance[4];
+  bool sensor[4];
   // connect endpoint
   HTTPClient http;
   http.begin(endPoint);
@@ -62,32 +59,17 @@ void loop() {
   
   // trigger 발생
   for (int i = 0; i < 4; i++){
-    digitalWrite(triggerPin[i], LOW);
-    delayMicroseconds(2);
-    digitalWrite(triggerPin[i], HIGH);
-    delayMicroseconds(10);
-    digitalWrite(triggerPin[i], LOW);
-    duration[i] = pulseIn(echoPin[i], HIGH); 
-  }
-    
-  // Get distance
-  for (int i = 0; i < 4; i++){
-    distance[i] = duration[i] * 17 / 1000;
+    sensor[i] = digitalRead(inputPin[i]); 
   }
 
   // print distancce
   for (int i = 0; i < 4; i++){
-    Serial.print("Distance" + String(i) + ": ");
-    Serial.print(distance[i]);
-    Serial.print("cm ");  
-    Serial.print("Duration" + String(i) + ": ");
-    Serial.print(duration[i]);
-    Serial.print("ms\n");
+    Serial.print("sensor " + i + " : " + sensor[i] + "\n");
   }
   
   // JSON Object
   for (int i = 0; i < 4; i++){
-    data["distance" + String(i)] = distance[i];
+    data["sensor" + String(i)] = sensor[i];
   }
   
   String requestBody;
